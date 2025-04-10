@@ -1,49 +1,44 @@
 import time
+import random
 
-class Garden:
-    def __init__(self, soil_moisture=50, water_level=100):
-        self.soil_moisture = soil_moisture         
-    def check_soil_moisture(self):
-        """A talaj nedvességének ellenőrzése"""
-        if self.soil_moisture < 30:
-            print("A talaj túl száraz, szükséges az öntözés!")
-            return False
-        else:
-            print("A talaj megfelelően nedves.")
-            return True
+class Ontozorendszer:
+    def __init__(self, nedvesseg_kuszob=30):
+        self.nedvesseg_kuszob = nedvesseg_kuszob  # százalékban
+        self.nedvesseg = random.randint(20, 80)
+        self.ontozo_bekapcsolva = False
 
-    def water_plants(self):
-        """Öntözés elindítása"""
-        if self.water_level > 0:
-            print("Öntözés folyamatban...")
-            self.soil_moisture += 30  
-            self.water_level -= 10  
-            print(f"Az öntözés befejeződött. Talaj nedvessége: {self.soil_moisture}%")
-            print(f"Vízszint: {self.water_level}%")
-        else:
-            print("Nincs elég víz az öntözéshez!")
+    def mer_nedvesseg(self):
+        # Véletlenszerűen csökken a nedvesség, mintha száradna a talaj
+        self.nedvesseg -= random.uniform(0.5, 2.5)
+        if self.nedvesseg < 0:
+            self.nedvesseg = 0
+        return round(self.nedvesseg, 2)
 
-    def simulate_day(self):
-        """A nap szimulációja: a talaj nedvessége csökkenhet, és a vízszint is"""
-        self.soil_moisture -= 10 
-        self.water_level -= 5 
+    def ontoz(self):
+        print("💧 Öntözés elindítva...")
+        self.ontozo_bekapcsolva = True
+        for i in range(5):
+            self.nedvesseg += random.uniform(3.0, 6.0)
+            print(f"   ➤ Öntözés folyamatban... Nedvesség: {round(self.nedvesseg, 2)}%")
+            time.sleep(1)
+        self.ontozo_bekapcsolva = False
+        print("✅ Öntözés leállítva.")
 
-        print("\nMa:")
-        print(f"Talaj nedvessége: {self.soil_moisture}%")
-        print(f"Vízszint: {self.water_level}%")
+    def futtat(self, ciklusok=10):
+        print("🌿 Automata öntözőrendszer elindítva...\n")
+        for i in range(ciklusok):
+            aktualis_nedvesseg = self.mer_nedvesseg()
+            print(f"[{i+1}. ciklus] Talaj nedvessége: {aktualis_nedvesseg}%")
+            if aktualis_nedvesseg < self.nedvesseg_kuszob:
+                print("⚠️  Alacsony nedvességszint! Öntözés szükséges.")
+                self.ontoz()
+            else:
+                print("✅ A talaj elég nedves, nincs szükség öntözésre.")
+            print("-" * 40)
+            time.sleep(2)
+        print("\n🌱 Öntözőrendszer leállítva.")
 
-        if not self.check_soil_moisture():
-            self.water_plants()
-
-
-
-def main():
-    garden = Garden() 
-    days = 5 
-
-    for day in range(1, days + 1):
-        print(f"\nNap {day}")
-        garden.simulate_day()
-        time.sleep(1)  
-
-    print
+# Fő program
+if __name__ == "__main__":
+    ontozorendszer = Ontozorendszer(nedvesseg_kuszob=35)
+    ontozorendszer.futtat(ciklusok=8)
